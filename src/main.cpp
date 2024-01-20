@@ -59,7 +59,7 @@ void opcontrol() {
 
     while (true) {
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
-			catapult.move_relative(720, 30);
+			catapult.move_relative(720, 80);
             double p = catapult.get_positions().at(0);
             while (dabs(catapult.get_positions().at(0) - p) < 720) {
                 pros::delay(20);

@@ -1,8 +1,8 @@
 #include "main.h"
 
 // Motor Ports
-const int LEFT_CAT_MOTOR_PORT = 1;
-const int RIGHT_CAT_MOTOR_PORT = 11;
+const int LEFT_CAT_MOTOR_PORT = 11;
+const int RIGHT_CAT_MOTOR_PORT = 2;
 const int Puncher_Motor_Port = 10;
 
 // Declarations
@@ -20,7 +20,7 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
 */
 void punch() {
     puncher_motor.move_relative(110, 30);
-    pros::delay(1000);
+    pros::delay(800);
     puncher_motor.move_relative(-110, 30);
 }
 
@@ -36,26 +36,18 @@ void autonomous() {
 }
 
 void opcontrol() {
-    pros::delay(1000);
-	while (1) {
-        punch();
-        pros::delay(3000);
+    pros::ADIDigitalIn limit1 ('A');
+
+    bool isRunning = false;
+
+    while (true) {
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
+			catapult.move_relative(720, 20);
+        }
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
+            punch();
+        }
+        
+        pros::delay(20);
     }
-	
-    // pros::ADIDigitalIn limit1 ('A');
-
-    // bool isRunning = false;
-
-	// // button.get_new_press()
-    // while (true) {
-    //     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A) && !isRunning){
-	// 		isRunning = true;
-	// 		catapult.move_voltage(5000);
-    //     }
-    //     if (limit1.get_new_press()) {
-    //         isRunning = false;
-	// 		catapult.move_voltage(0);
-    //     }
-	// 	pros::delay(20);
-    // }
 }

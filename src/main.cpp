@@ -5,6 +5,10 @@ const int LEFT_CAT_MOTOR_PORT = 11;
 const int RIGHT_CAT_MOTOR_PORT = 2;
 const int Puncher_Motor_Port = 10;
 
+int count = 0;
+
+pros::ADIDigitalIn limit ('A');
+
 // Declarations
 pros::Motor left_cat_motor(LEFT_CAT_MOTOR_PORT, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor right_cat_motor(RIGHT_CAT_MOTOR_PORT, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
@@ -20,8 +24,9 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
 */
 void punch() {
     puncher_motor.move_relative(135, 40);
-    pros::delay(1200);
+    pros::delay(2000);
     puncher_motor.move_relative(-135, 40);
+    pros::delay(1000);
 }
 
 void initialize() {
@@ -30,13 +35,23 @@ void initialize() {
 
 void disabled() {}
 
-void competition_initialize() {}
+void competition_initialize() {
+}
 
 void autonomous() {
+    pros::delay(13500); 
+    // Run the catapult once which is 720 degrees
+    // Then loop 10 times punching twice followed by another catapult launch.
+    catapult.move_relative(720, 30);
+    pros::delay(4000);
+    for (int i = 0; i < 10; i++) {
+        punch();
+        catapult.move_relative(720, 30);
+        pros::delay(4000);
+    }
 }
 
 void opcontrol() {
-    pros::ADIDigitalIn limit1 ('A');
 
     bool isRunning = false;
 

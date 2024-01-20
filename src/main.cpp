@@ -19,9 +19,9 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
  * then stops for half a second and then moves back to its original position
 */
 void punch() {
-    puncher_motor.move_relative(110, 30);
-    pros::delay(800);
-    puncher_motor.move_relative(-110, 30);
+    puncher_motor.move_relative(135, 40);
+    pros::delay(1200);
+    puncher_motor.move_relative(-135, 40);
 }
 
 void initialize() {
@@ -42,7 +42,7 @@ void opcontrol() {
 
     while (true) {
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
-			catapult.move_relative(720, 20);
+			catapult.move_relative(720, 30);
         }
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
             punch();

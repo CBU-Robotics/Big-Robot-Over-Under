@@ -25,7 +25,7 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
 void punch() {
     puncher_motor.move_relative(135, 40);
     pros::delay(2000);
-    puncher_motor.move_relative(-135, 40);
+    puncher_motor.move_relative(-135, 60);
     pros::delay(1000);
 }
 
@@ -44,20 +44,32 @@ void autonomous() {
     // Then loop 10 times punching twice followed by another catapult launch.
     catapult.move_relative(720, 30);
     pros::delay(4000);
-    for (int i = 0; i < 10; i++) {
-        punch();
+    for (int i = 0; i < 4; i++) {
+        punch(); // 3 seconds
         catapult.move_relative(720, 30);
-        pros::delay(4000);
+        pros::delay(6000);
     }
+}
+
+double dabs(double v) {
+    return v < 0 ? -v : v;
 }
 
 void opcontrol() {
 
-    bool isRunning = false;
-
     while (true) {
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
 			catapult.move_relative(720, 30);
+            double p = catapult.get_positions().at(0);
+            while (dabs(catapult.get_positions().at(0) - p) < 720) {
+                pros::delay(20);
+            }
+        } else {
+            const double MAX_RPM = 30.;
+            int t = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+            if (t < -10 || t > 10)
+            catapult.move_velocity((int) ((double) (t) / 127. * MAX_RPM));
+            else catapult.move_velocity(0);
         }
         if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)){
             punch();

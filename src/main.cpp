@@ -23,9 +23,9 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
  * then stops for half a second and then moves back to its original position
 */
 void punch() {
-    puncher_motor.move_relative(135, 40);
-    pros::delay(2000);
-    puncher_motor.move_relative(-135, 60);
+    puncher_motor.move_relative(100, 40);
+    pros::delay(750);
+    puncher_motor.move_relative(-100, 100);
     pros::delay(1000);
 }
 

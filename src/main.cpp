@@ -27,12 +27,13 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
  */
 void punch() {
   puncher_motor.move_relative(100, 40);
-  pros::delay(750);
-  puncher_motor.move_relative(-100, 100);
   pros::delay(1000);
+  puncher_motor.move_relative(-100, 80);
+  pros::delay(1000);
+  puncher_motor.brake();
 }
 
-void initialize() { puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE); }
+void initialize() { puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST); }
 
 void disabled() {}
 
@@ -42,12 +43,12 @@ void autonomous() {
   pros::delay(13500);
   // Run the catapult once which is 720 degrees
   // Then loop 10 times punching twice followed by another catapult launch.
-  catapult.move_relative(720, 30);
-  pros::delay(4000);
-  for (int i = 0; i < 4; i++) {
+  catapult.move_relative(-720, 100);
+  pros::delay(3000);
+  for (int i = 0; i < 10; i++) {
     punch(); // 3 seconds
-    catapult.move_relative(720, 30);
-    pros::delay(6000);
+    catapult.move_relative(-720, 100);
+    pros::delay(4000);
   }
 }
 
@@ -57,7 +58,7 @@ void opcontrol() {
 
   while (true) {
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      catapult.move_relative(-720, 80);
+      catapult.move_relative(-720, 100);
       double p = catapult.get_positions().at(0);
       int t = 200;
       while (dabs(catapult.get_positions().at(0) - p) < 720 && t != 0) {

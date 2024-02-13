@@ -40,7 +40,7 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-  pros::delay(13500);
+  pros::delay(10000);
   // Run the catapult once which is 720 degrees
   // Then loop 10 times punching twice followed by another catapult launch.
   catapult.move_relative(-720, 100);
@@ -48,7 +48,7 @@ void autonomous() {
   for (int i = 0; i < 11; i++) {
     punch(); // 2 seconds
     catapult.move_relative(-720, 100);
-    pros::delay(3000);
+    pros::delay(2250);
   }
 }
 

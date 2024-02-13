@@ -45,10 +45,10 @@ void autonomous() {
   // Then loop 10 times punching twice followed by another catapult launch.
   catapult.move_relative(-720, 100);
   pros::delay(3000);
-  for (int i = 0; i < 10; i++) {
-    punch(); // 3 seconds
+  for (int i = 0; i < 11; i++) {
+    punch(); // 2 seconds
     catapult.move_relative(-720, 100);
-    pros::delay(4000);
+    pros::delay(3000);
   }
 }
 

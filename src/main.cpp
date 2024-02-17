@@ -39,16 +39,18 @@ void disabled() {}
 
 void competition_initialize() {}
 
+// We have one preload, one alliance triball, and 10 match loads that can be introduced in autonomous
+// Small Robot also has one preload
 void autonomous() {
-  pros::delay(10000);
-  // Run the catapult once which is 720 degrees
-  // Then loop 10 times punching twice followed by another catapult launch.
+  pros::delay(6000);
+  // Run the catapult once which is 720 degrees to lauch preload
   catapult.move_relative(-720, 100);
   pros::delay(3000);
+  // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) {
     punch(); // 2 seconds
     catapult.move_relative(-720, 100);
-    pros::delay(2250);
+    pros::delay(2000);
   }
 }
 

@@ -45,12 +45,12 @@ void autonomous() {
   pros::delay(6000);
   // Run the catapult once which is 720 degrees to lauch preload
   catapult.move_relative(-720, 100);
-  pros::delay(3000);
+  pros::delay(1000);
   // Then loop to load and launch catapult 11 times.
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 22; i++) {  // 11 for normal matches
     punch(); // 2 seconds
     catapult.move_relative(-720, 100);
-    pros::delay(2000);
+    pros::delay(1000);
   }
 }
 

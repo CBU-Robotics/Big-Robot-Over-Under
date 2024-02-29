@@ -1,7 +1,4 @@
 #include "main.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 // Motor Ports
 const int LEFT_CAT_MOTOR_PORT = 11;
@@ -16,7 +13,7 @@ pros::ADIDigitalIn limit('A');
 pros::Motor left_cat_motor(LEFT_CAT_MOTOR_PORT, pros::E_MOTOR_GEAR_GREEN, false,
                            pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor right_cat_motor(RIGHT_CAT_MOTOR_PORT, pros::E_MOTOR_GEAR_GREEN,
-                            true, pros::E_MOTOR_ENCODER_DEGREES);
+                              true, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, true,
                           pros::E_MOTOR_ENCODER_DEGREES);
 
@@ -29,11 +26,9 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
  * then stops for half a second and then moves back to its original position
  */
 void punch() {
-  puncher_motor.move_relative(100, 100);
-  srand(time(NULL));
-  int i = rand()%10;
-  pros::delay(i * 100 + 300);
-  puncher_motor.move_relative(-100, 100);
+  puncher_motor.move_relative(140, 70);
+  pros::delay(500);
+  puncher_motor.move_relative(-140, 70);
   pros::delay(1000);
   puncher_motor.brake();
 }
@@ -47,15 +42,16 @@ void competition_initialize() {}
 // We have one preload, one alliance triball, and 10 match loads that can be introduced in autonomous
 // Small Robot also has one preload
 void autonomous() {
-  pros::delay(6000);
-  // Run the catapult once which is 720 degrees to lauch preload
-  catapult.move_relative(-720, 100);
-  pros::delay(1000);
+  pros::delay(5000);
+  // Run the catapult once which is 723 degrees to lauch preload
+  catapult.move_relative(-723, 100);
+  puncher_motor.move_relative(-100, 70);
+  pros::delay(500);
   // Then loop to load and launch catapult 11 times.
-  for (int i = 0; i < 22; i++) {  // 11 for normal matches
+  for (int i = 0; i < 11; i++) {  // 11 for normal matches
     punch(); // 2 seconds
-    catapult.move_relative(-720, 100);
-    pros::delay(1000);
+    catapult.move_relative(-723, 100);
+    pros::delay(500);
   }
 }
 
@@ -65,10 +61,10 @@ void opcontrol() {
 
   while (true) {
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      catapult.move_relative(-720, 100);
+      catapult.move_relative(-723, 100);
       double p = catapult.get_positions().at(0);
       int t = 200;
-      while (dabs(catapult.get_positions().at(0) - p) < 720 && t != 0) {
+      while (dabs(catapult.get_positions().at(0) - p) < 723 && t != 0) {
         pros::delay(20);
 	t --;
       }

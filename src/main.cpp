@@ -46,29 +46,27 @@ void autonomous() {
   // Run the catapult once which is 723 degrees to lauch preload
   catapult.move_relative(-723, 100);
   puncher_motor.move_relative(-100, 70);
-  pros::delay(500);
+  pros::delay(500); // 250ms not enough time.
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 23; i++) {  // 11 for normal matches
     punch(); // 2 seconds
     catapult.move_relative(-723, 100);
-    pros::delay(500);
+    pros::delay(250); // reduced from 500ms to 250ms to load while catpult is resetting
   }
+  puncher_motor.move_relative(100, 70);
 }
 
 double dabs(double v) { return v < 0 ? -v : v; }
 
 void opcontrol() {
-
   while (true) {
+    // Launch and reload the catapult
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       catapult.move_relative(-723, 100);
-      double p = catapult.get_positions().at(0);
-      int t = 200;
-      while (dabs(catapult.get_positions().at(0) - p) < 723 && t != 0) {
-        pros::delay(20);
-	t --;
-      }
-    } else {
+      pros::delay(250);
+      punch();
+    // if the joystick is not at 0, move the catapult manuelly to fix cam issues
+    } else if (master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) != 0){
       const double MAX_RPM = 30.;
       int t = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
       if (t < -10 || t > 10)
@@ -76,10 +74,15 @@ void opcontrol() {
       else
         catapult.move_velocity(0);
     }
+    /**
+     * IMPORTANT: Drop the intake to get match load introduced
+     * between autonomous and driver control
+    */
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-      punch();
+      puncher_motor.move_relative(-100, 70);
+      pros::delay(1000);
+      puncher_motor.brake();
     }
-
     pros::delay(20);
   }
 }

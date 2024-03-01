@@ -48,7 +48,7 @@ void autonomous() {
   puncher_motor.move_relative(-100, 70);
   pros::delay(500); // 250ms not enough time.
   // Then loop to load and launch catapult 11 times.
-  for (int i = 0; i < 23; i++) {  // 11 for normal matches
+  for (int i = 0; i < 11; i++) {  // 11 for normal matches
     punch(); // 2 seconds
     catapult.move_relative(-723, 100);
     pros::delay(250); // reduced from 500ms to 250ms to load while catpult is resetting

@@ -53,7 +53,6 @@ void autonomous() {
     catapult.move_relative(-723, 100);
     pros::delay(250); // reduced from 500ms to 250ms to load while catpult is resetting
   }
-  puncher_motor.move_relative(100, 70);
 }
 
 double dabs(double v) { return v < 0 ? -v : v; }
@@ -74,14 +73,8 @@ void opcontrol() {
       else
         catapult.move_velocity(0);
     }
-    /**
-     * IMPORTANT: Drop the intake to get match load introduced
-     * between autonomous and driver control
-    */
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-      puncher_motor.move_relative(-100, 70);
-      pros::delay(1000);
-      puncher_motor.brake();
+      punch();
     }
     pros::delay(20);
   }

@@ -1,11 +1,11 @@
 #include "main.h"
 
 // Motor Ports
-const int LEFT_CAT_MOTOR1_PORT = 13;
-const int LEFT_CAT_MOTOR2_PORT = 14;
-const int RIGHT_CAT_MOTOR1_PORT = 2;
-const int RIGHT_CAT_MOTOR2_PORT = 4;
-const int Puncher_Motor_Port = 10;
+const int LEFT_CAT_MOTOR1_PORT = 9;
+const int LEFT_CAT_MOTOR2_PORT = 10;
+const int RIGHT_CAT_MOTOR1_PORT = 1;
+const int RIGHT_CAT_MOTOR2_PORT = 2;
+const int Puncher_Motor_Port = 5;
 const int SPIN_MOTOR_PORT = 12;
 
 int count = 0;
@@ -21,7 +21,7 @@ pros::Motor right_cat_motor1(RIGHT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_GREEN,
                             true, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor right_cat_motor2(RIGHT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_GREEN,
                              false, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, true,
+pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, false,
                           pros::E_MOTOR_ENCODER_DEGREES);
 
 pros::Motor spin_motor(SPIN_MOTOR_PORT, pros::E_MOTOR_GEAR_RED, true,
@@ -88,14 +88,14 @@ void autonomous() {
   // while loop delay until 5 seconds have passed
   delay(5000);
   // Run the catapult once which is 723 degrees to lauch preload
-  catapult.move_relative(-723, 100);
+  catapult.move_relative(-361, 100);
   puncher_motor.move_relative(-100, 70);
   delay(500);
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) { // 11 for normal matches
     punch(); // 1.5 seconds
     delay(750);
-    catapult.move_relative(-723, 100);
+    catapult.move_relative(-361, 100);
     delay(750);
   }
 }
@@ -106,7 +106,7 @@ void opcontrol() {
   while (true) {
     // Launch and reload the catapult
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      catapult.move_relative(-723, 100);
+      catapult.move_relative(-361, 100);
       // if the joystick is not at 0, move the catapult manuelly to fix cam
       // issues
     } else if (master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) != 0 && joystickEnable == true) {

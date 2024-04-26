@@ -7,19 +7,19 @@ const int RIGHT_CAT_MOTOR1_PORT = 1;
 const int RIGHT_CAT_MOTOR2_PORT = 2;
 const int Puncher_Motor_Port = 5;
 const int SPIN_MOTOR_PORT = 12;
+const int HOLO_SENSOR_PORT = 'A';
 
 int count = 0;
 
-pros::ADIDigitalIn limit('A');
 
 // Declarations
-pros::Motor left_cat_motor1(LEFT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_GREEN, false,
+pros::Motor left_cat_motor1(LEFT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_RED, false,
                            pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor left_cat_motor2(LEFT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_GREEN, true,
+pros::Motor left_cat_motor2(LEFT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_RED, true,
                             pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor right_cat_motor1(RIGHT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_GREEN,
+pros::Motor right_cat_motor1(RIGHT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_RED,
                             true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor right_cat_motor2(RIGHT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_GREEN,
+pros::Motor right_cat_motor2(RIGHT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_RED,
                              false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, false,
                           pros::E_MOTOR_ENCODER_DEGREES);
@@ -31,7 +31,12 @@ pros::Motor_Group catapult({left_cat_motor1, left_cat_motor2, right_cat_motor1, 
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-double dabs(double v) { return v < 0 ? -v : v; }
+pros::ADIDigitalIn holo_sensor(HOLO_SENSOR_PORT);
+
+double dabs(double v) {
+	return v < 0.0 ? -v : v;
+}
+
 
 // Global timer
 double start_time;
@@ -74,7 +79,24 @@ void punch() {
   delay(1000);
 }
 
-void initialize() { puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST); }
+void launch() {
+  catapult.move_velocity(-100);
+  while (holo_sensor.get_value()) {} // Allow cam to leave holo
+  // Loop while holo is false
+  while(true) {
+    // Check holo sensor
+    if(holo_sensor.get_value()) {
+      catapult.brake();
+      break;
+    }
+  }
+
+}
+
+void initialize() { 
+  puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  catapult.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
+ }
 
 void disabled() {}
 
@@ -87,15 +109,17 @@ void autonomous() {
   start_time = pros::millis();
   // while loop delay until 5 seconds have passed
   delay(5000);
-  // Run the catapult once which is 723 degrees to lauch preload
-  catapult.move_relative(-361, 100);
+  // Run the catapult once which is 361 degrees to lauch preload
+  // catapult.move_relative(-361, 100);
+  launch();
   puncher_motor.move_relative(-100, 70);
   delay(500);
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) { // 11 for normal matches
     punch(); // 1.5 seconds
     delay(750);
-    catapult.move_relative(-361, 100);
+    // catapult.move_relative(-361, 100);
+    launch();
     delay(750);
   }
 }
@@ -106,7 +130,8 @@ void opcontrol() {
   while (true) {
     // Launch and reload the catapult
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      catapult.move_relative(-361, 100);
+      // catapult.move_relative(-361, 100);
+      launch();
       // if the joystick is not at 0, move the catapult manuelly to fix cam
       // issues
     } else if (master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) != 0 && joystickEnable == true) {

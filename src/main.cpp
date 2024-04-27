@@ -55,28 +55,37 @@ void delay(int time) {
  * then stops for half a second and then moves back to its original position
  */
 void punch() {
-  // puncher_motor.move_relative(140,60);
-  puncher_motor.brake();
-  puncher_motor.move_relative(140, 100); // was 70 rpm
+  int setAngle = 190;
+  int startAngle = 135;
+
+  // grabing the triball
+  puncher_motor.move_velocity(-120);
   double position = puncher_motor.get_position();
-  while (int i = dabs(puncher_motor.get_position() - position) < 130) {
-    puncher_motor.modify_profiled_velocity(sqrt((140*140) - (i*i)));
-    i = dabs(puncher_motor.get_position() - position);
+  while (dabs(puncher_motor.get_position() - position) < startAngle) {
     delay(20);
   }
+  puncher_motor.brake();
+  delay(300);
+
+  // setting the triball
+  puncher_motor.move_velocity(50);
+  position = puncher_motor.get_position();
+  while (dabs(puncher_motor.get_position() - position) < setAngle) {
+    delay(20);
+  }
+  puncher_motor.brake();
+  delay(300);
   
-
-  delay(500);
-  // puncher_motor.move_relative(-140, 70);
-  puncher_motor.move_relative(-140, 100); // was 70 rpm
-  double position2 = puncher_motor.get_position();
-  while (int i = dabs(puncher_motor.get_position() - position2) < 130) {
-    puncher_motor.modify_profiled_velocity(sqrt((140*140) - (i*i)));
-    i = dabs(puncher_motor.get_position() - position2);
+  // moving back to center
+  puncher_motor.move_velocity(-70);
+  position = puncher_motor.get_position();
+  while (dabs(puncher_motor.get_position() - position) < setAngle - startAngle - 10) {
     delay(20);
   }
-
-  delay(1000);
+  puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  puncher_motor.brake();
+  delay(300);
+  puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
 void launch() {
@@ -94,7 +103,7 @@ void launch() {
 }
 
 void initialize() { 
-  puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
   catapult.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
  }
 
@@ -112,7 +121,12 @@ void autonomous() {
   // Run the catapult once which is 361 degrees to lauch preload
   // catapult.move_relative(-361, 100);
   launch();
-  puncher_motor.move_relative(-100, 70);
+
+  //
+  // Removed the inial movement down to pick up a ball as that is handled in punch now
+  // Currently untested
+  //
+
   delay(500);
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) { // 11 for normal matches
@@ -150,7 +164,7 @@ void opcontrol() {
      * between autonomous and driver control
      */
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-	punch();
+	    punch();
     }
 
     pros::delay(20);

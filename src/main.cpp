@@ -148,7 +148,8 @@ void opcontrol() {
                         // catapult.move_relative(-361, 100);
                         launch();
                 }
-
+		
+		// Arrows up/down
                 catapult.move_velocity(30 *
                                        (master.get_digital_new_press(
                                             pros::E_CONTROLLER_DIGITAL_DOWN) -

@@ -11,14 +11,13 @@ const int HOLO_SENSOR_PORT = 'A';
 
 int count = 0;
 
-
 // Declarations
 pros::Motor left_cat_motor1(LEFT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_RED, false,
-                           pros::E_MOTOR_ENCODER_DEGREES);
+                            pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor left_cat_motor2(LEFT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_RED, true,
                             pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor right_cat_motor1(RIGHT_CAT_MOTOR1_PORT, pros::E_MOTOR_GEAR_RED,
-                            true, pros::E_MOTOR_ENCODER_DEGREES);
+                             true, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor right_cat_motor2(RIGHT_CAT_MOTOR2_PORT, pros::E_MOTOR_GEAR_RED,
                              false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, false,
@@ -27,16 +26,14 @@ pros::Motor puncher_motor(Puncher_Motor_Port, pros::E_MOTOR_GEAR_RED, false,
 pros::Motor spin_motor(SPIN_MOTOR_PORT, pros::E_MOTOR_GEAR_RED, true,
                        pros::E_MOTOR_ENCODER_DEGREES);
 
-pros::Motor_Group catapult({left_cat_motor1, left_cat_motor2, right_cat_motor1, right_cat_motor2});
+pros::Motor_Group catapult({left_cat_motor1, left_cat_motor2, right_cat_motor1,
+                            right_cat_motor2});
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 pros::ADIDigitalIn holo_sensor(HOLO_SENSOR_PORT);
 
-double dabs(double v) {
-	return v < 0.0 ? -v : v;
-}
-
+double dabs(double v) { return v < 0.0 ? -v : v; }
 
 // Global timer
 double start_time;
@@ -63,7 +60,7 @@ void fix() {
   }
   puncher_motor.brake();
   delay(300);
-  
+
   // moving back to center
   puncher_motor.move_velocity(-60);
   double position = puncher_motor.get_position();
@@ -75,7 +72,6 @@ void fix() {
   delay(300);
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
-
 
 void punch() {
   // grabing the triball
@@ -89,7 +85,6 @@ void punch() {
 
   fix();
 }
-
 
 void launch() {
   // catapult.move_velocity(-100);
@@ -106,10 +101,10 @@ void launch() {
   catapult.move_relative(-361, 100);
 }
 
-void initialize() { 
+void initialize() {
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
   catapult.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
- }
+}
 
 void disabled() {}
 
@@ -128,14 +123,14 @@ void autonomous() {
   launch();
 
   //
-  // Removed the inial movement down to pick up a ball as that is handled in punch now
-  // Currently untested
+  // Removed the inial movement down to pick up a ball as that is handled in
+  // punch now Currently untested
   //
 
   delay(500);
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) { // 11 for normal matches
-    punch(); // 1.5 seconds
+    punch();                     // 1.5 seconds
     delay(750);
     // catapult.move_relative(-361, 100);
     launch();
@@ -151,24 +146,22 @@ void opcontrol() {
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       // catapult.move_relative(-361, 100);
       launch();
-      // if the joystick is not at 0, move the catapult manuelly to fix cam
-      // issues
-    } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
-      catapult.move_velocity(30);
-    } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
-      catapult.move_velocity(-30);
     }
-    
+
+    catapult.move_velocity(
+        30 * (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN) -
+              master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)));
+
     /**
      * IMPORTANT: Drop the intake to get match load introduced
      * between autonomous and driver control
      */
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-	    punch();
+      punch();
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-	    catapult.move_relative(-350, 100);
+      catapult.move_relative(-350, 100);
       const double position = catapult.get_positions()[0] - 350;
       while (dabs(catapult.get_positions()[0] - position) < 65) {
         delay(20);
@@ -176,7 +169,7 @@ void opcontrol() {
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-	    fix();
+      fix();
     }
 
     pros::delay(20);

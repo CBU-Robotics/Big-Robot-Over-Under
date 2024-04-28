@@ -84,11 +84,8 @@ void punch() {
   // grabing the triball
   puncher_motor.move_velocity(-90);
   while (puncher_motor.get_current_draw() < 2200) {
-    std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw()<<std::endl;
-
     delay(20);
   }
-  std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw()<<std::endl;
 
   puncher_motor.brake();
   delay(300);
@@ -183,11 +180,4 @@ void opcontrol() {
 
     pros::delay(20);
   }
-
-  // puncher_motor.move_velocity(50);
-  // while(true) {
-  //   std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw() << std::endl;
-  //   pros::delay(10);
-  // }
-
 }

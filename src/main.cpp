@@ -54,32 +54,20 @@ void delay(int time) {
  * This function moves the puncher_motor 165 degrees,
  * then stops for half a second and then moves back to its original position
  */
-void punch() {
-  int setAngle = 190;
-  int startAngle = 135;
 
-  // grabing the triball
-  puncher_motor.move_velocity(-120);
-  double position = puncher_motor.get_position();
-  while (dabs(puncher_motor.get_position() - position) < startAngle) {
-    delay(20);
-  }
-  puncher_motor.brake();
-  delay(300);
-
+void fix() {
   // setting the triball
-  puncher_motor.move_velocity(50);
-  position = puncher_motor.get_position();
-  while (dabs(puncher_motor.get_position() - position) < setAngle) {
+  puncher_motor.move_velocity(40);
+  while (puncher_motor.get_current_draw() < 2200) {
     delay(20);
   }
   puncher_motor.brake();
   delay(300);
   
   // moving back to center
-  puncher_motor.move_velocity(-70);
-  position = puncher_motor.get_position();
-  while (dabs(puncher_motor.get_position() - position) < setAngle - startAngle - 10) {
+  puncher_motor.move_velocity(-60);
+  double position = puncher_motor.get_position();
+  while (dabs(puncher_motor.get_position() - position) < 65) {
     delay(20);
   }
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -87,6 +75,27 @@ void punch() {
   delay(300);
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
+
+
+void punch() {
+  int setAngle = 180;
+  int startAngle = 125;
+
+  // grabing the triball
+  puncher_motor.move_velocity(-90);
+  while (puncher_motor.get_current_draw() < 2200) {
+    std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw()<<std::endl;
+
+    delay(20);
+  }
+  std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw()<<std::endl;
+
+  puncher_motor.brake();
+  delay(300);
+
+  fix();
+}
+
 
 void launch() {
   catapult.move_velocity(-100);
@@ -114,6 +123,7 @@ void competition_initialize() {}
 // We have one preload, one alliance triball, and 10 match loads that can be
 // introduced in autonomous Small Robot also has one preload
 void autonomous() {
+  fix();
   // get the current time
   start_time = pros::millis();
   // while loop delay until 5 seconds have passed
@@ -167,6 +177,17 @@ void opcontrol() {
 	    punch();
     }
 
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+	    fix();
+    }
+
     pros::delay(20);
   }
+
+  // puncher_motor.move_velocity(50);
+  // while(true) {
+  //   std::cout << "Motor Current Draw: " << puncher_motor.get_current_draw() << std::endl;
+  //   pros::delay(10);
+  // }
+
 }

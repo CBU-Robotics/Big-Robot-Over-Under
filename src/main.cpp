@@ -55,33 +55,44 @@ void delay(int time) {
 void fix() {
   // setting the triball
   puncher_motor.move_velocity(50);
-  while (puncher_motor.get_current_draw() < 2200) {
+  while (puncher_motor.get_current_draw() < 2500) {
     delay(20);
   }
   puncher_motor.brake();
-  delay(300);
+  delay(100);
 
   // moving back to center
   puncher_motor.move_velocity(-60);
   double position = puncher_motor.get_position();
-  while (dabs(puncher_motor.get_position() - position) < 60) {
+  while (dabs(puncher_motor.get_position() - position) < 55) {
     delay(20);
   }
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   puncher_motor.brake();
-  delay(300);
+  delay(100);
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
 void punch() {
   // grabing the triball
-  puncher_motor.move_velocity(-75);
-  while (puncher_motor.get_current_draw() < 2200) {
+  puncher_motor.move_velocity(-80);
+  while (puncher_motor.get_current_draw() < 2500) {
     delay(20);
   }
 
   puncher_motor.brake();
-  delay(300);
+  delay(100);
+
+  puncher_motor.move_velocity(50);
+  while (puncher_motor.get_current_draw() < 2500) {
+    delay(20);
+  }
+  puncher_motor.brake();
+  delay(100);
+
+  puncher_motor.move_velocity(-100);
+  delay(150);
+  puncher_motor.brake();
 
   fix();
 }
@@ -98,7 +109,7 @@ void launch() {
   //   }
   // }
 
-  catapult.move_relative(-361, 100);
+  catapult.move_relative(-360.5, 100);
 }
 
 void initialize() {
@@ -139,7 +150,6 @@ void autonomous() {
 }
 
 void opcontrol() {
-  bool joystickEnable = false;
   spin_motor.move_relative(300, 20);
   while (true) {
     // Launch and reload the catapult
@@ -157,7 +167,7 @@ void opcontrol() {
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-      catapult.move_relative(-358, 100);
+      catapult.move_relative(-357.8, 100);
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {

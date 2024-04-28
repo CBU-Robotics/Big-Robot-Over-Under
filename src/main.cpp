@@ -57,7 +57,7 @@ void delay(int time) {
 
 void fix() {
   // setting the triball
-  puncher_motor.move_velocity(40);
+  puncher_motor.move_velocity(50);
   while (puncher_motor.get_current_draw() < 2200) {
     delay(20);
   }
@@ -67,7 +67,7 @@ void fix() {
   // moving back to center
   puncher_motor.move_velocity(-60);
   double position = puncher_motor.get_position();
-  while (dabs(puncher_motor.get_position() - position) < 65) {
+  while (dabs(puncher_motor.get_position() - position) < 60) {
     delay(20);
   }
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -78,11 +78,8 @@ void fix() {
 
 
 void punch() {
-  int setAngle = 180;
-  int startAngle = 125;
-
   // grabing the triball
-  puncher_motor.move_velocity(-90);
+  puncher_motor.move_velocity(-75);
   while (puncher_motor.get_current_draw() < 2200) {
     delay(20);
   }
@@ -95,17 +92,18 @@ void punch() {
 
 
 void launch() {
-  catapult.move_velocity(-100);
-  while (holo_sensor.get_value()) {} // Allow cam to leave holo
-  // Loop while holo is false
-  while(true) {
-    // Check holo sensor
-    if(holo_sensor.get_value()) {
-      catapult.brake();
-      break;
-    }
-  }
+  // catapult.move_velocity(-100);
+  // while (holo_sensor.get_value()) {} // Allow cam to leave holo
+  // // Loop while holo is false
+  // while(true) {
+  //   // Check holo sensor
+  //   if(holo_sensor.get_value()) {
+  //     catapult.brake();
+  //     break;
+  //   }
+  // }
 
+  catapult.move_relative(-361, 100);
 }
 
 void initialize() { 
@@ -155,15 +153,10 @@ void opcontrol() {
       launch();
       // if the joystick is not at 0, move the catapult manuelly to fix cam
       // issues
-    } else if (master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) != 0 && joystickEnable == true) {
-      const double MAX_RPM = 30.;
-      int t = master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-      if (t < -10 || t > 10)
-        catapult.move_velocity((int)((double)(t) / 127. * MAX_RPM));
-      else
-        catapult.move_velocity(0);
-    } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-      joystickEnable = !joystickEnable;
+    } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+      catapult.move_velocity(30);
+    } else if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+      catapult.move_velocity(-30);
     }
     
     /**
@@ -175,6 +168,14 @@ void opcontrol() {
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+	    catapult.move_relative(-350, 100);
+      const double position = catapult.get_positions()[0] - 350;
+      while (dabs(catapult.get_positions()[0] - position) < 65) {
+        delay(20);
+      }
+    }
+
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
 	    fix();
     }
 

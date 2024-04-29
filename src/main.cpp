@@ -92,7 +92,7 @@ void launch() {
   //   }
   // }
 
-  catapult.move_relative(-360.3, 100); 
+  catapult.move_relative(-360.5, 100); 
 }
 
 void initialize() {
@@ -116,7 +116,7 @@ void autonomous() {
   pros::delay(5000);
   // Run the catapult once which is 361 degrees to lauch preload
   // catapult.move_relative(-361, 100);
-  catapult.move_relative(-357, 100); 
+  catapult.move_relative(-359, 100); 
 
   //
   // Removed the inial movement down to pick up a ball as that is handled
@@ -152,7 +152,7 @@ void opcontrol() {
       puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
       catapult.brake();
       pros::delay(50);
-      catapult.move_relative(-361, 100);
+      catapult.move_relative(-364, 100);
       catapult.set_brake_modes(pros::E_MOTOR_BRAKE_HOLD);
     }
 

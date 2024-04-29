@@ -39,66 +39,96 @@ double dabs(double v) { return v < 0.0 ? -v : v; }
 double start_time;
 double current_time;
 
-void delay(int time) {
-  current_time = start_time;
-  while (current_time - start_time < time) {
-    current_time = pros::millis();
-  }
-  start_time += time;
-}
+// void delay(int time) {
+//   current_time = start_time;
+//   while (current_time - start_time < time) {
+//     current_time = pros::millis();
+//   }
+//   start_time += time;
+// }
 
 /**
  * This function moves the puncher_motor 165 degrees,
  * then stops for half a second and then moves back to its original position
  */
 
-void fix() {
+void fix_triball() {
   // setting the triball
   puncher_motor.move_velocity(50);
   while (puncher_motor.get_current_draw() < 2200) {
-    delay(20);
+    pros::delay(20);
   }
   puncher_motor.brake();
-  delay(300);
+  pros::delay(300);
 
   // moving back to center
   puncher_motor.move_velocity(-60);
   double position = puncher_motor.get_position();
   while (dabs(puncher_motor.get_position() - position) < 60) {
-    delay(20);
+    pros::delay(20);
   }
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   puncher_motor.brake();
-  delay(300);
+  pros::delay(300);
   puncher_motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
 void punch() {
-  // grabing the triball
+  // grabbing the triball
   puncher_motor.move_velocity(-75);
   while (puncher_motor.get_current_draw() < 2200) {
-    delay(20);
+    pros::delay(20);
   }
 
   puncher_motor.brake();
-  delay(300);
+  pros::delay(300);
 
-  fix();
+  fix_triball();
 }
 
-void launch() {
-  // catapult.move_velocity(-100);
-  // while (holo_sensor.get_value()) {} // Allow cam to leave holo
-  // // Loop while holo is false
-  // while(true) {
-  //   // Check holo sensor
-  //   if(holo_sensor.get_value()) {
-  //     catapult.brake();
-  //     break;
-  //   }
-  // }
+//function returns average current of catapult motors
+int get_average_current(){
+  return (dabs(left_cat_motor1.get_current_draw())+dabs(left_cat_motor2.get_current_draw())+
+    dabs(right_cat_motor1.get_current_draw())+dabs(right_cat_motor2.get_current_draw()))/4;
+}
 
-  catapult.move_relative(-361, 100);
+void fix_catapult(){
+  catapult.move_velocity(25);
+      
+  while(get_average_current() < 1000){
+    pros::delay(10);
+  }
+
+  catapult.brake();
+
+  catapult.move_relative(-362, 100);
+}
+
+//function returns average torque of catapult motors
+double get_average_torque(){
+  return (dabs(left_cat_motor1.get_torque())+dabs(left_cat_motor2.get_torque())+
+    dabs(right_cat_motor1.get_torque())+dabs(right_cat_motor2.get_torque()))/4;
+}
+
+
+void launch(bool auto_fix) {
+  //start moving catapult to hard coded position
+  std::cout << "launch works" << std::endl;
+
+  double start_pos = left_cat_motor1.get_position();
+  catapult.move_velocity(-100);
+
+
+  while (dabs(left_cat_motor1.get_position() - start_pos) < 358){
+    std::cout << "pos " << dabs(left_cat_motor1.get_position() - start_pos) << std::endl;
+    
+    if (auto_fix && get_average_torque() < 0.1){
+      fix_catapult();
+    }
+
+    pros::delay(2);
+  }
+  catapult.brake();
 }
 
 void initialize() {
@@ -113,28 +143,28 @@ void competition_initialize() {}
 // We have one preload, one alliance triball, and 10 match loads that can be
 // introduced in autonomous Small Robot also has one preload
 void autonomous() {
-  fix();
+  fix_triball();
   // get the current time
   start_time = pros::millis();
   // while loop delay until 5 seconds have passed
-  delay(5000);
+  pros::delay(5000);
   // Run the catapult once which is 361 degrees to lauch preload
   // catapult.move_relative(-361, 100);
-  launch();
+  launch(true);
 
   //
   // Removed the inial movement down to pick up a ball as that is handled
   // in punch now Currently untested
   //
 
-  delay(500);
+  pros::delay(500);
   // Then loop to load and launch catapult 11 times.
   for (int i = 0; i < 11; i++) { // 11 for normal matches
     punch();         // 1.5 seconds
-    delay(750);
+    pros::delay(750);
     // catapult.move_relative(-361, 100);
-    launch();
-    delay(750);
+    launch(true);
+    pros::delay(750);
   }
 }
 
@@ -144,8 +174,9 @@ void opcontrol() {
   while (true) {
     // Launch and reload the catapult
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+      std::cout << "button A works" << std::endl;
       // catapult.move_relative(-361, 100);
-      launch();
+      launch(false);
     }
 
     /**
@@ -157,13 +188,14 @@ void opcontrol() {
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-      catapult.move_relative(-358, 100);
+      fix_catapult();
     }
 
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-      fix();
+      fix_triball();
     }
 
     pros::delay(20);
   }
+
 }

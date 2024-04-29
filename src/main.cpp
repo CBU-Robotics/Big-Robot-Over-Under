@@ -99,9 +99,9 @@ void fix_catapult(){
     pros::delay(10);
   }
 
-  catapult.brake();
+  pros::delay(10);
 
-  catapult.move_relative(-362, 100);
+  catapult.move_relative(-359, 100);
 }
 
 //function returns average torque of catapult motors
@@ -122,6 +122,7 @@ void launch(bool auto_fix) {
   while (dabs(left_cat_motor1.get_position() - start_pos) < 358){
     std::cout << "pos " << dabs(left_cat_motor1.get_position() - start_pos) << std::endl;
     
+    while(auto_fix && get_average_torque() < 0.1){pros::delay(10);}
     if (auto_fix && get_average_torque() < 0.1){
       fix_catapult();
     }
@@ -176,7 +177,7 @@ void opcontrol() {
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       std::cout << "button A works" << std::endl;
       // catapult.move_relative(-361, 100);
-      launch(false);
+      launch(true);
     }
 
     /**
